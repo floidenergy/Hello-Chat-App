@@ -1,7 +1,112 @@
+
 #include <jy_jai.hpp>
 #include <payload.hpp>
 #include <typeinfo>
 #include <fstream>
+
+// wx library
+#include <wx/wx.h>
+#include <wx/list.h>
+#include <wx/listctrl.h>
+#include <wx/splitter.h>
+
+class Frame : public wxFrame{
+
+    wxListBox* ChatBox;
+    wxListView* ClientsDisplay;
+    wxTextCtrl* UserNameInput;
+    wxTextCtrl* AddressInput;
+    wxButton* ConnectButton;
+    wxButton* ExitButton;
+    wxTextCtrl* msgBox;
+    wxButton* SendButton;
+
+public:
+    Frame(wxWindowID _ID = wxID_ANY, std::string _Title = "Window", wxPoint _Position = wxDefaultPosition, wxSize _Size = wxDefaultSize )
+    : wxFrame(nullptr, _ID, _Title, _Position, _Size, wxNO_BORDER){
+ 
+        wxStaticText* UserNameLable = new wxStaticText(this, wxID_ANY, "Username", wxDefaultPosition, wxSize(69, 20));
+        UserNameInput = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxSize(116, 21), wxNO_BORDER);
+        UserNameInput->SetBackgroundColour(wxColor(255,255,255));
+
+        wxStaticText* AddressLable = new wxStaticText(this, wxID_ANY, "Address", wxDefaultPosition, wxSize(53, 20));
+        AddressInput = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxSize(141, 21), wxNO_BORDER);
+        AddressInput->SetBackgroundColour(wxColor(255,255,255));
+
+        ConnectButton = new wxButton(this, wxID_ANY, "Connect", wxDefaultPosition, wxSize(75, 21), wxNO_BORDER);
+        ConnectButton->SetBackgroundColour(wxColor(255, 255, 255));
+        ExitButton = new wxButton(this, wxID_ANY, "Exit", wxDefaultPosition, wxSize(75, 21), wxNO_BORDER);
+        ExitButton->SetBackgroundColour(wxColor(255, 255, 255));
+        ExitButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent &e){
+            this->Close();
+        });
+
+        wxSizer* Settings_Sizer = new wxBoxSizer(wxHORIZONTAL);
+        Settings_Sizer->Add(UserNameLable, 0);
+        Settings_Sizer->Add(UserNameInput, 0, wxLEFT, 10);
+        Settings_Sizer->Add(AddressLable, 0, wxLEFT, 10);
+        Settings_Sizer->Add(AddressInput, 0, wxLEFT, 10);
+        Settings_Sizer->Add(ConnectButton, 0, wxLEFT, 10);
+        Settings_Sizer->Add(ExitButton, 0, wxLEFT , 10);
+
+//#########################################################################################
+
+        ChatBox = new wxListBox(this, wxID_ANY, wxDefaultPosition, wxSize(400, 321));
+        ChatBox->SetBackgroundColour(wxColor(255, 255, 255));
+        ChatBox->SetExtraStyle(wxNO_BORDER);
+
+        ClientsDisplay = new wxListView(this, wxID_ANY, wxDefaultPosition, wxSize(169, 321));
+        ClientsDisplay->SetBackgroundColour(wxColor(255, 255, 255));
+        ClientsDisplay->AppendColumn("ID");
+        ClientsDisplay->AppendColumn("UserName");
+        ClientsDisplay->SetColumnWidth(0, 50);
+        ClientsDisplay->SetColumnWidth(1, 150);
+
+        wxSizer* OutputSizer = new wxBoxSizer(wxHORIZONTAL);
+        OutputSizer->Add(ChatBox, 0);
+        OutputSizer->Add(ClientsDisplay, 0, wxLEFT, 10);
+
+//#########################################################################################
+        
+        msgBox = new wxTextCtrl(this, wxID_ANY, "", wxDefaultPosition, wxSize(464, 21), wxNO_BORDER);
+        msgBox->SetBackgroundColour(wxColor(255, 255, 255));
+        
+        SendButton = new wxButton(this, wxID_ANY, "Send", wxDefaultPosition, wxSize(107, 21), wxNO_BORDER);
+        SendButton->SetBackgroundColour(wxColor(255, 255, 255));
+        
+        wxSizer* ControlSizer = new wxBoxSizer(wxHORIZONTAL);
+        ControlSizer->Add(msgBox, 0);
+        ControlSizer->Add(SendButton, 0, wxLEFT, 10);
+        
+//#########################################################################################
+
+        wxSizer* MainSizer = new wxBoxSizer(wxVERTICAL);
+        MainSizer->Add(Settings_Sizer, 0, wxALL, 10);
+        MainSizer->Add(OutputSizer, 0, wxLEFT | wxRIGHT, 10);
+        MainSizer->Add(ControlSizer, 0, wxALL, 10);
+
+        this->SetSizerAndFit(MainSizer);
+    }
+
+    ~Frame(){}
+};
+
+class App : public wxApp{
+    
+public:
+    App(){}
+    ~App(){}
+
+    virtual bool OnInit(){
+        Frame *frame = new Frame(wxID_ANY, "Jai-jy chat app", wxPoint(50, 50), wxSize(600, 400));
+        frame->SetBackgroundColour(wxColor(238, 238, 238));
+        frame->Show();
+
+        return true;
+    }
+};
+
+wxIMPLEMENT_APP(App);
 
 
 struct Client : public jai::net::Client_interface<Message_id>{
@@ -61,8 +166,9 @@ public:
     }
 };
 
+
 //client
-int main(){
+int main_____(){
     std::fstream UserFile("profil.txt", std::ios::in | std::ios::out);
     if(!UserFile.is_open()){
         UserFile.open("profil.txt", std::ios::out);
@@ -124,45 +230,3 @@ int main(){
 
     return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// OLDDD
-
-/*
-int main(){
-    asio::io_context Context;
-    asio::ip::tcp::endpoint ep(asio::ip::make_address("127.0.0.1"), 6250);
-    asio::ip::tcp::socket Soc(Context);
-
-    Soc.connect(ep);
-
-    jai::net::Payload<Message_id> p;
-    std::string name;
-    while(Soc.is_open()){
-        std::cout << "=> ";
-        std::getline(std::cin, name);
-        p << name;
-
-        Soc.write_some(asio::buffer(&p.Header, sizeof(jai::net::MessageHeader<Message_id>)));
-
-        Soc.write_some(asio::buffer(p.Body.data(), p.Header.size));
-        name.clear();
-    }
-    system("pause");
-    return 0;
-}
-*/
