@@ -13,7 +13,7 @@ namespace jai{
         class Server{
         
         protected:
-            asio::io_context Context;
+            std::shared_ptr<asio::io_context> Context;
             asio::ip::tcp::acceptor Acceptor;
 
             std::vector<std::shared_ptr<Connection<T>>> Connections;
@@ -22,17 +22,19 @@ namespace jai{
 
         public:
 
-            Server() : Acceptor(Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 6250)){}
+            Server() : Context(std::make_shared<asio::io_context>()), Acceptor(*Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 6250)){
+                
+            }
 
             ~Server(){}
 
-            void run(){Context.run();}
+            void run(){Context->run();}
 
             void Start(){
                 std::cout << "Listing on port: " << PORT << std::endl;
                 WaitingForConnection(); 
 
-                asio::io_context::work idleWork(Context);
+                asio::io_context::work idleWork(*Context);
             }
 
             // starting to wait for new clients to connect
@@ -49,7 +51,7 @@ namespace jai{
 
             // starting to wait for new message from clients
             void ListeningForMessages(){                    
-                asio::post(Context, [this](){
+                asio::post(*Context, [this](){
                     if(!c_Queue.empty()){
                         
                         size_t times = c_Queue.size();

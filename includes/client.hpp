@@ -8,18 +8,17 @@ namespace jai{
         
         template<typename T>
         struct Client_interface{
-            asio::io_context Context;
+            std::shared_ptr<asio::io_context> Context;
             Connection<T> _Connection;
             Ownership Owner;
             asio::ip::tcp::endpoint ep;
 
-            Client_interface() : _Connection(Context, Ownership::Client){}
-            Client_interface(std::string ip) : _Connection(Context, Ownership::Client), ep(asio::ip::make_address(ip), PORT){}
+            Client_interface() : Context(std::make_shared<asio::io_context>()), _Connection(Context, Ownership::Client){}
+            Client_interface(std::string ip) : Context(std::make_shared<asio::io_context>()), _Connection(Context, Ownership::Client), ep(asio::ip::make_address(ip), PORT){}
 
             bool Connect(){
                 asio::error_code ec;
-                _Connection.Socket->connect(ep, ec);
-                if(ec){
+                if(!_Connection.Connect(ep)){
                     return false;
                 }else{
                     return true;
@@ -79,7 +78,7 @@ namespace jai{
                 
             }
 
-            void run(){ Context.run(); }
+            void run(){ Context->run(); }
             bool isConnected(){return _Connection.Socket->is_open();}
 
             //  SETTERS

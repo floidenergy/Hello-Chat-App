@@ -1,0 +1,29 @@
+// TODO : FIND A WAY FOR SERVER TO MAINTAIN THE ID VALUES
+
+
+
+
+
+// TODO : (LAST TASK TO DO) TRY TO MAKE SERVER HANDLE ERROR
+    HERE HOW U MAKE AN ERROR:
+
+    ON client.hpp
+    change this:
+            bool Connect(){
+                asio::error_code ec;
+                if(!_Connection.Connect(ep)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }
+
+    to this:
+            bool Connect(){
+                asio::error_code ec;
+                if(_Connection.Connect(ep)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }

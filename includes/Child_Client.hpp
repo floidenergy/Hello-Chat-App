@@ -6,7 +6,9 @@ class App;
 
 class Client : public jai::net::Client_interface<Message_id>{
     //std::vector<jai::net::User> FriendsClient;
-    std::thread th_Context;
+
+    //the thread that will run (context.run());
+    std::unique_ptr<std::thread> th_Context;
     
     int numOfConnection;
 

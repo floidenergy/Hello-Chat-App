@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${default}",
+                "D:\\API\\asio-1.18.1\\asio-1.18.1\\include",
+                "C:\\Program Files (x86)\\wxWidgets\\include\\wx-3.1",
+                "C:\\Program Files (x86)\\wxWidgets\\lib\\wx\\include\\msw-unicode-3.1",
+                "C:\\Program Files (x86)\\wxWidgets\\lib"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "compilerPath": "C:\\mingw64\\bin\\gcc.exe",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}
