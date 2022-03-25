@@ -14,6 +14,7 @@
 #include <deque>
 #include <algorithm>
 #include <iomanip>
+#include <fstream>
 
 #include <payload.hpp>
 #include <connection.hpp>
@@ -31,5 +32,6 @@ enum class Message_id {
     ClientConnected,
     RecieveMessege,
     Disconnect,
-    ServerShutDown
+    ServerShutDown,
+    Init_NewClient
 };

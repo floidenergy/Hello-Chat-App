@@ -7,6 +7,11 @@ namespace jai{
 
         struct User{
             char name[20];
+            int ID;
+
+            std::string GetUserName(){
+                return std::string(name) + "#" + std::to_string(ID);
+            }
         };
 
         enum class Ownership{
@@ -16,23 +21,36 @@ namespace jai{
 
         template<typename T>
         struct Connection : std::enable_shared_from_this<Connection<T>>{
+            asio::io_context* context;
+            
             Payload<T> Data;
             std::shared_ptr<asio::ip::tcp::socket> Socket;
             Ownership _Owner;
             User UserInfo;
+            
+            bool _IsConnected;
 
             Connection() = default;
 
             Connection(asio::io_context &Contxt, Ownership owner)
-                : Socket(std::make_shared<asio::ip::tcp::socket>(Contxt)), _Owner(owner){}
+                : Socket(std::make_shared<asio::ip::tcp::socket>(Contxt)), _Owner(owner){
+                    context = &Contxt;
+                    _IsConnected = false;
+                }
 
             Connection(std::shared_ptr<asio::ip::tcp::socket> _soc, Ownership owner){
+                _IsConnected = false;
                 Socket = _soc;
                 _Owner = owner;
             }
 
-            void SetUserInfo(std::string _name){
+            ~Connection(){
+                delete context;
+            }
+
+            void SetUserInfo(std::string _name, int _ID){
                 strcpy(UserInfo.name, _name.c_str());
+                UserInfo.ID = _ID;
             }
 
             bool Connect(asio::ip::tcp::endpoint ep){
@@ -43,12 +61,16 @@ namespace jai{
                     return false;
                 }
                     std::cout << "Connected~" << std::endl;
+                    _IsConnected = true;
                     return true;
             }
 
-            void Disconnect(){                
+            void Disconnect(){     
+                _IsConnected = false;           
                 Socket->cancel();
                 Socket->close();
+                Socket.reset();
+                Socket = std::make_shared<asio::ip::tcp::socket>(*context);
             }
 
             void Ban(){

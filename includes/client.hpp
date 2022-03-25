@@ -13,7 +13,7 @@ namespace jai{
             Ownership Owner;
             asio::ip::tcp::endpoint ep;
 
-            Client_interface() = default;
+            Client_interface() : _Connection(Context, Ownership::Client){}
             Client_interface(std::string ip) : _Connection(Context, Ownership::Client), ep(asio::ip::make_address(ip), PORT){}
 
             bool Connect(){
@@ -24,6 +24,10 @@ namespace jai{
                 }else{
                     return true;
                 }
+            }
+
+            void Disconnect(){
+                _Connection.Disconnect();
             }
 
             void async_read(){
@@ -77,6 +81,12 @@ namespace jai{
 
             void run(){ Context.run(); }
             bool isConnected(){return _Connection.Socket->is_open();}
+
+            //  SETTERS
+
+            void SetIpAddress(std::string IpAddress){
+                ep = asio::ip::tcp::endpoint(asio::ip::make_address(IpAddress), PORT);
+            }
 
             template<typename DataType>
             friend Client_interface<T>& operator<<(Client_interface<T> &Client, DataType& Data){
