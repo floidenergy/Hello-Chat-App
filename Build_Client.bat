@@ -1,2 +1,2 @@
-g++ client\*.cpp -o client -I includes -I "D:\API\asio-1.18.1\asio-1.18.1\include" -I "C:\Program Files (x86)\wxWidgets\include\wx-3.1" -I "C:\Program Files (x86)\wxWidgets\lib\wx\include\msw-unicode-3.1" -I "C:\Program Files (x86)\wxWidgets\lib" -L "C:\Program Files (x86)\wxWidgets\lib" -l wx_mswu_core-3.1.dll -l wx_baseu-3.1.dll --static -l ws2_32 -l wsock32 -l pthread
-client
+g++ client\*.cpp -o bin\client.exe -I includes -I "D:\API\asio-1.18.1\asio-1.18.1\include" -I "C:\Program Files (x86)\wxWidgets\include\wx-3.1" -I "C:\Program Files (x86)\wxWidgets\lib\wx\include\msw-unicode-3.1" -I "C:\Program Files (x86)\wxWidgets\lib" -L "C:\Program Files (x86)\wxWidgets\lib" -l wx_mswu_core-3.1.dll -l wx_baseu-3.1.dll --static -mwindows -l ws2_32 -l wsock32 -l pthread
+start bin\client

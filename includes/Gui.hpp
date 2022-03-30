@@ -29,4 +29,12 @@ public:
     void InitWindow();
     void ButtonBinding();
 
+    // button function
+    void b_sendMessage(wxCommandEvent &e);
+    
+    void OnKeyClicked(wxKeyEvent &e);
+
+    wxDECLARE_EVENT_TABLE();
 };
+
+

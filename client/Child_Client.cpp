@@ -47,7 +47,8 @@ void Client::OnMessageRecieve(){
         case Message_id::RecieveMessege:{
             _Connection.Data >> txt;
             app->ChatBox->AppendString(wxString(txt));
-            //std::cout << txt << std::endl;
+            app->ChatBox->PageDown();
+            
             break;
         }
 
@@ -70,10 +71,11 @@ void Client::start_Rcv(){
 
     asio::post(*this->Context, [this](){
                 std::cout << "start to recieve" << std::endl;
-
                 while(this->_Connection._IsConnected){
-                    this->_Connection.Recieve();
-                    this->OnMessageRecieve();
+                    try{
+                        this->_Connection.Recieve();
+                        this->OnMessageRecieve();
+                    }catch(std::exception &e){}
                 }
 
                 std::cout << "getting out" << std::endl;

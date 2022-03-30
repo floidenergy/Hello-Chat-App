@@ -79,6 +79,30 @@ void App::InitWindow(){
     Frame->SetSizerAndFit(MainSizer);
 }
 
+
+//////////////////// Key Function
+
+void App::OnKeyClicked(wxKeyEvent &e){
+    if(e.GetKeyCode() == WXK_RETURN){
+        if(msgBox->HasFocus()){
+            std::string msg = msgBox->GetValue().ToStdString();
+            if(!msg.empty()){
+                jai::net::Payload<Message_id> _Msg;
+                _Msg.Header.ID = Message_id::RecieveMessege;
+                _Msg << msg;
+                _Client.Send(_Msg);
+                msgBox->Clear();
+                ChatBox->AppendString(wxString(msg));
+                ChatBox->PageDown();
+                msgBox->SetFocus();
+            }
+        }
+    }
+
+    e.Skip();
+}
+
+//////////////////// button function
 void App::ButtonBinding(){
     ExitButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent &e){
         Frame->Close();
@@ -101,14 +125,52 @@ void App::ButtonBinding(){
                     _Client._Connection.Recieve();
                     
                     _Client._Connection.Data >> _Client._Connection.UserInfo.ID;
+
+                    UserNameInput->Disable();
+                    AddressInput->Disable();
                 
                     _Client.start_Rcv();
+
+                    msgBox->SetFocus();
                 }else{
                     std::cout << "fail to connect" << std::endl;
                 }
         }else if(_Client.isConnected()){
             _Client.Disconnect();
             ConnectButton->SetLabel("Connect");
+
+            UserNameInput->Enable();
+            AddressInput->Enable();
+
+            ChatBox->Clear();
+            ClientsDisplay->DeleteAllItems();
+
+            ChatBox->Refresh();
+            ClientsDisplay->Refresh();
         }
     });
+
+    this->SendButton->Bind(wxEVT_BUTTON, App::b_sendMessage, this);
 }
+
+
+void App::b_sendMessage(wxCommandEvent &e){
+    std::string msg = msgBox->GetValue().ToStdString();
+    if(!msg.empty()){
+        jai::net::Payload<Message_id> _Msg;
+        _Msg.Header.ID = Message_id::RecieveMessege;
+        _Msg << msg;
+        _Client.Send(_Msg);
+        msgBox->Clear();
+        ChatBox->AppendString(wxString(msg));
+        ChatBox->PageDown();
+    }
+}
+
+
+
+//////// EVENT TABLE
+
+wxBEGIN_EVENT_TABLE(App, wxApp)
+    EVT_KEY_DOWN(App::OnKeyClicked)
+wxEND_EVENT_TABLE()
